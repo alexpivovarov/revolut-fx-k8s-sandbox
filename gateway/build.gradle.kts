@@ -24,3 +24,5 @@ dependencyManagement {
 tasks.test {
     useJUnitPlatform()
 }
+
+spring.application.name=gateway
