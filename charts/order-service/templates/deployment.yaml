@@ -1,0 +1,55 @@
+# --- Deployment runs pods ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}            # deployment name = Helm release name
+spec:
+  replicas: {{ .Values.replicaCount }} # number of pod replicas
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}         # must match pod template labels below
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}       # label so Service can select these pods
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}      # container name (usually chart name)
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" # image + tag from values.yaml
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8082      # app listens on 8082
+          readinessProbe:              # when true → ready to receive traffic
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:               # when false → kube restarts container
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+{{ toYaml .Values.resources | indent 12 }}   # CPU/mem requests/limits from values.yaml
+          env:
+{{- range .Values.env }}
+            - name: "{{ .name }}"      # env vars injected from values.yaml
+              value: "{{ .value }}"
+{{- end }}
+
+---
+# --- Service exposes the pods on a stable virtual IP/DNS ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}            # service name = Helm release name
+spec:
+  type: {{ .Values.service.type }}     # ClusterIP/NodePort/LoadBalancer
+  selector:
+    app: {{ .Release.Name }}           # routes to pods with this label
+  ports:
+    - name: http
+      port: {{ .Values.service.port }} # service port clients use (cluster)
+      targetPort: 8082                 # container port inside the pod
