@@ -1,0 +1,38 @@
+# ----- Container image to deploy -----
+image:
+  # Repository/name of the image (change to your real registry path)
+  # e.g., ghcr.io/your-user/gateway
+  repository: local/gateway
+  # Image tag/version (could be a semver or a git SHA)
+  tag: "0.1.0"
+  # When to pull the image: IfNotPresent (default), Always, or Never
+  pullPolicy: IfNotPresent
+
+# ----- How many pod replicas -----
+replicaCount: 1  # use >1 in prod for high availability
+
+# ----- Kubernetes Service (stable virtual IP/DNS) -----
+service:
+  # ClusterIP = internal-only service 
+  # NodePort/LoadBalancer expose externally
+  type: ClusterIP
+  # Port clients use to reach the Service (forwards to container’s targetPort)
+  port: 80  # your container listens on 8080; template maps 80 -> 8080
+
+# ----- Resource requests/limits (scheduler & caps) -----
+resources:
+  requests:
+    cpu: 100m      # 0.1 CPU guaranteed
+    memory: 256Mi  # 256 MiB guaranteed
+  limits:
+    cpu: 500m      # up to 0.5 CPU
+    memory: 512Mi  # up to 512 MiB
+
+# ----- Environment variables passed to the container -----
+# Example:
+# env:
+#   - name: SPRING_PROFILES_ACTIVE
+#     value: docker
+#   - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+#     value: health,info,prometheus,gateway
+env: []
