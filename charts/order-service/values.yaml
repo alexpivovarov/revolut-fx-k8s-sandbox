@@ -1,0 +1,40 @@
+# ---- Container image to run ----
+image:
+  # Full image name (registry/repo). Change to your real registry path.
+  # e.g., ghcr.io/your-user/order-service
+  repository: local/order-service
+  # Image tag/version (semver or a git SHA)
+  tag: "0.1.0"
+  # When to pull: IfNotPresent (default), Always, or Never
+  pullPolicy: IfNotPresent
+
+# ---- How many pod replicas ----
+replicaCount: 1  # use 2+ in prod for HA
+
+# ---- Kubernetes Service (stable cluster IP/DNS) ----
+service:
+  # ClusterIP = internal-only service (typical for backends)
+  # NodePort/LoadBalancer expose externally
+  type: ClusterIP
+  # Port clients use to reach the Service (forwards to container targetPort)
+  # App listens on 8082; the template maps service.port -> targetPort: 8082
+  port: 80  
+
+# ---- Resource requests/limits ----
+resources:
+  requests:
+    cpu: 100m      # scheduler guarantees 0.1 CPU
+    memory: 256Mi  # and 256 MiB RAM
+  limits:
+    cpu: 500m      # hard cap 0.5 CPU
+    memory: 512Mi  # hard cap 512 MiB
+
+# ---- Environment variables for the container ----
+# Examples:
+# - name: SPRING_PROFILES_ACTIVE
+#   value: docker
+# - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+#   value: health,info,prometheus
+# - name: QUOTES_BASE_URL
+#   value: http://quote-service:8081
+env: []
