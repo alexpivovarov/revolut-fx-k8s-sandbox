@@ -1,0 +1,55 @@
+# --- Deployment: runs the app pods ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}            # deployment name = Helm release name
+spec:
+  replicas: {{ .Values.replicaCount }} # number of pod replicas
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}         # must match pod template labels below
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}       # label so the Service can select these pods
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}      # container name (usually chart name)
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"  # image + tag from values.yaml
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8081      # app listens on 8081
+          readinessProbe:              # when true → ready to receive traffic
+            httpGet:
+              path: /actuator/health   # consider /actuator/health/readiness if enabled
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:               # when false → kube restarts container
+            httpGet:
+              path: /actuator/health   # consider /actuator/health/liveness if enabled
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+{{ toYaml .Values.resources | indent 12 }}   # CPU/memory requests/limits from values.yaml
+          env:
+{{- range .Values.env }}
+            - name: "{{ .name }}"      # env vars injected from values.yaml
+              value: "{{ .value }}"
+{{- end }}
+
+---
+# --- Service: stable virtual IP/DNS in the cluster ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}            # service name = Helm release name
+spec:
+  type: {{ .Values.service.type }}     # ClusterIP/NodePort/LoadBalancer
+  selector:
+    app: {{ .Release.Name }}           # routes to pods with this label
+  ports:
+    - name: http
+      port: {{ .Values.service.port }} # service port clients use (inside cluster)
+      targetPort: 8081                 # container port exposed by the pod
