@@ -1,0 +1,39 @@
+# ---- Container image to deploy ----
+image:
+  # Full image name (registry/repo). Change to your real registry path.
+  # e.g., ghcr.io/your-user/quote-service
+  repository: local/quote-service
+  # Image tag/version (SemVer or a git SHA)
+  tag: "0.1.0"
+  # When to pull the image: IfNotPresent | Always | Never
+  pullPolicy: IfNotPresent
+
+# ---- Number of pod replicas ----
+replicaCount: 1  # use 2+ in prod for HA
+
+# ---- Kubernetes Service (stable cluster IP/DNS) ----
+service:
+  # ClusterIP = internal-only service (typical for backends)
+  # NodePort/LoadBalancer expose externally
+  type: ClusterIP
+  # Service port clients use inside the cluster.
+  # Your pod listens on 8081; the template maps this service.port -> targetPort: 8081
+  port: 80        # set to 8081 if you prefer 1:1 mapping
+
+# ---- Resource requests/limits (scheduling & caps) ----
+resources:
+  requests:
+    cpu: 100m      # scheduler guarantees 0.1 CPU
+    memory: 256Mi  # and 256 MiB RAM
+  limits:
+    cpu: 500m      # hard cap 0.5 CPU
+    memory: 512Mi  # hard cap 512 MiB
+
+# ---- Environment variables for the container ----
+# Examples:
+# env:
+#   - name: SPRING_PROFILES_ACTIVE
+#     value: docker
+#   - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+#     value: health,info,prometheus
+env: []
