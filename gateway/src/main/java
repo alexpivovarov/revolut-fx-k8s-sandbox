@@ -1,0 +1,30 @@
+package com.example.fx.gateway;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * Spring Boot entry point for the Gateway.
+ * @SpringBootApplication combines:
+ *  - @Configuration        (can declare beans),
+ *  - @EnableAutoConfiguration (wire components based on classpath),
+ *  - @ComponentScan        (scan com.example.fx.gateway and subpackages).
+ */
+
+@SpringBootApplication
+public class GatewayApplication {
+
+    /**
+     * Standard Java entry point.
+     * SpringApplication.run():
+     *  1) boots the Spring context (IoC container),
+     *  2) applies auto-configuration,
+     *  3) reads application.properties,
+     *  4) starts the embedded HTTP server,
+     *  5) keeps the app running until the process is stopped.
+     */
+
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
+}
