@@ -1,23 +1,32 @@
+# Kubernetes API version for Deployments
 apiVersion: apps/v1
 
+# The kind of Kubernetes object being defined
 kind: Deployment
 
+# Standard object metadata
 metadata:
 
+  # Name of the Deployment
   name: gateway
 
+  # Target namespace
   namespace: fx
 
+# Desired state of the Deployment
 spec:
 
+  # Number of pod replicas
   replicas: 1
 
+  # How to identify pods managed by this Deployment
   selector:
 
     matchLabels:
 
       app: gateway
 
+  # Pod template used for creating pods
   template:
 
     metadata:
@@ -32,14 +41,18 @@ spec:
 
         - name: gateway
 
+          # Container image to run
           image: fx/gateway:dev
 
+          # Pull policy: only pull if not present locally
           imagePullPolicy: IfNotPresent
 
+          # Ports exposed by the container
           ports:
 
             - containerPort: 8080
 
+          # Checks if the app is ready to serve traffic
           readinessProbe:
 
             httpGet: { path: /actuator/health, port: 8080 }
@@ -48,6 +61,7 @@ spec:
 
             periodSeconds: 5
 
+          # Checks if the app is alive; restarts if failing
           livenessProbe:
 
             httpGet: { path: /actuator/health, port: 8080 }
@@ -58,22 +72,28 @@ spec:
 
 ---
 
+# Kubernetes API version for Services
 apiVersion: v1
 
+# The kind of Kubernetes object being defined
 kind: Service
 
 metadata:
 
+  # Service name
   name: gateway
 
+  # Target namespace
   namespace: fx
 
 spec:
 
+  # Route traffic to pods with this label
   selector:
 
     app: gateway
 
+  # Service ports exposed internally in the cluster
   ports:
 
     - name: http
@@ -82,7 +102,7 @@ spec:
 
       targetPort: 8080
 
+  # Cluster-internal service type; use port-forward for local access
   # ClusterIP is fine; we'll port-forward for local access
 
   type: ClusterIP
- 
