@@ -1,27 +1,37 @@
+# Kubernetes API version for Deployments
 apiVersion: apps/v1
 
+# The kind of Kubernetes object being defined
 kind: Deployment
 
+# Standard object metadata
 metadata:
 
+  # Name of the Deployment
   name: order-service
 
+  # Target namespace
   namespace: fx
 
+# Desired state of the Deployment
 spec:
 
+  # Number of pod replicas
   replicas: 1
 
+  # How to identify pods managed by this Deployment
   selector:
 
     matchLabels:
 
       app: order-service
 
+  # Pod template used for creating pods
   template:
 
     metadata:
 
+      # Labels applied to pods; must match the selector
       labels:
 
         app: order-service
@@ -32,14 +42,18 @@ spec:
 
         - name: order-service
 
+          # Container image to run
           image: fx/order-service:dev
 
+          # Pull only if the image is not present locally
           imagePullPolicy: IfNotPresent
 
+          # Ports exposed by the container
           ports:
 
             - containerPort: 8082
 
+          # Readiness: when passing, pod can receive traffic
           readinessProbe:
 
             httpGet: { path: /actuator/health, port: 8082 }
@@ -48,6 +62,7 @@ spec:
 
             periodSeconds: 5
 
+          # Liveness: when failing, container is restarted
           livenessProbe:
 
             httpGet: { path: /actuator/health, port: 8082 }
@@ -58,27 +73,34 @@ spec:
 
 ---
 
+# Kubernetes API version for Services
 apiVersion: v1
 
+# The kind of Kubernetes object being defined
 kind: Service
 
 metadata:
 
+  # Service name
   name: order-service
 
+  # Target namespace
   namespace: fx
 
 spec:
 
+  # Route traffic to pods with this label
   selector:
 
     app: order-service
 
+  # Service ports exposed internally in the cluster
   ports:
 
     - name: http
 
       port: 8082
 
-      targetPort: 8082
+      targetPort: 8082 
+  # Service type not specified; defaults to ClusterIP
  
