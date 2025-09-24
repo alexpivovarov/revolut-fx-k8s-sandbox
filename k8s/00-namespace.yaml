@@ -1,4 +1,10 @@
+# Kubernetes API version for this resource type
 apiVersion: v1
+
+# The kind of Kubernetes object being defined
 kind: Namespace
+
+# Standard object metadata
 metadata:
+  # The name of the namespace to create
   name: fx
