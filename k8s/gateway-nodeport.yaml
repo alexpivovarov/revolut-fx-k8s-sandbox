@@ -1,0 +1,21 @@
+# Kubernetes API version for this resource type
+apiVersion: v1
+
+# The kind of Kubernetes object being defined
+kind: Service
+
+# Standard object metadata
+metadata:
+ name: gateway-nodeport  # Service name
+ namespace: fx           # Target namespace
+
+# Desired configuration of the Service
+spec:
+ type: NodePort          # Expose on each node's IP at a static port
+ selector:
+   app: gateway          # Target pods with label app=gateway
+ ports:
+   - name: http          # Logical port name
+     port: 8080          # Service port (cluster-internal)
+     targetPort: 8080    # Container port on the pods
+     nodePort: 30080     # Node port on each node
