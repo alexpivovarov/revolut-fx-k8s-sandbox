@@ -1,0 +1,24 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# IDEs & editors
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs & crash dumps
+*.log
+hs_err_pid*
+replay_pid*
+
+# Archives
+*.zip
