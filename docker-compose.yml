@@ -1,25 +1,21 @@
-version: "3.9"
+version: "3.9"                       # Compose file format version
 services:
   quote-service:
     build:
-      context: .
-      dockerfile: quote-service/Dockerfile
+      context: .                     # Build context: repo root
+      dockerfile: quote-service/Dockerfile  # Dockerfile path for quote-service
     ports:
-      - "8081:8081"
+      - "8081:8081"                  # Expose container 8081 to host 8081
 
   order-service:
     build:
-      context: .
-      dockerfile: order-service/Dockerfile
+      context: .                     # Build context: repo root
+      dockerfile: order-service/Dockerfile  # Dockerfile path for order-service
     ports:
-      - "8082:8082"
+      - "8082:8082"                  # Expose container 8082 to host 8082
 
   gateway:
     build:
-      context: .
-      dockerfile: gateway/Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - quote-service
-      - order-service
+      context: .                     # Build context: repo root
+      dockerfile: gateway/Dockerfile # Dockerfile path for gateway
+    # No ports mapped: reachable by other services via service name "gateway"
