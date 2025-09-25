@@ -1,0 +1,19 @@
+# Kind configuration object type
+kind: Cluster
+
+# Kind config API version
+apiVersion: kind.x-k8s.io/v1alpha4
+
+# List of nodes that will form the cluster
+nodes:
+
+  # Define a control-plane node (also runs the API server, scheduler, etc.)
+  - role: control-plane
+
+    # Map container (node) ports to host ports for local access
+    extraPortMappings:
+
+      # Expose a NodePort (inside the kind node) on your host
+      - containerPort: 30080   # Port inside the kind node (e.g., Service nodePort)
+        hostPort: 30080        # Port on your host machine (reachable at localhost:30080)
+        protocol: TCP          # TCP traffic (default for HTTP-like services)
