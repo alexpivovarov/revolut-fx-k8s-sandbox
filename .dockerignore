@@ -1,0 +1,6 @@
+# Ignore files not needed inside Docker
+gradle.properties
+.gradle
+build
+out
+*.log
