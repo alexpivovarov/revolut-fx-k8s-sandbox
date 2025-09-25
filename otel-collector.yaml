@@ -1,21 +1,21 @@
 receivers:
-  otlp:
+  otlp:                       # Accept incoming telemetry in OTLP format
     protocols:
-      grpc: {} 
-      http: {}
+      grpc: {}                # Enable OTLP over gRPC (default port 4317)
+      http: {}                # Enable OTLP over HTTP (default port 4318)
 
 processors:
-  batch: {}
+  batch: {}                   # Buffer and send spans in batches to improve throughput
 
 exporters:
-  jaeger:
-    endpoint: jaeger:14250
+  jaeger:                     # Export traces to a Jaeger backend via gRPC
+    endpoint: jaeger:14250    # Jaeger collector gRPC endpoint (service name:port)
     tls:
-      insecure: true
+      insecure: true          # Disable TLS for local/dev use
 
 service:
   pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [jaeger]
+    traces:                   # Define the traces processing pipeline
+      receivers: [otlp]       # Ingest traces from the OTLP receiver
+      processors: [batch]     # Apply batching to outgoing spans
+      exporters: [jaeger]     # Send the processed spans to Jaeger
