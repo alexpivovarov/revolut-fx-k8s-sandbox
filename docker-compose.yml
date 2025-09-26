@@ -1,21 +1,33 @@
-version: "3.9"                       # Compose file format version
-services:
-  quote-service:
-    build:
-      context: .                     # Build context: repo root
-      dockerfile: quote-service/Dockerfile  # Dockerfile path for quote-service
-    ports:
-      - "8081:8081"                  # Expose container 8081 to host 8081
+# This docker-compose.yml defines a local multi-service environment for quote-service, order-service, and gateway. 
+# It builds each service from its Dockerfile under the monorepo root and wires them together on a default internal Docker network so they can reach each other via service names.
 
-  order-service:
-    build:
-      context: .                     # Build context: repo root
-      dockerfile: order-service/Dockerfile  # Dockerfile path for order-service
-    ports:
-      - "8082:8082"                  # Expose container 8082 to host 8082
+version: "3.9"                       # Compose file format version (feature set understood by Docker Compose)
 
-  gateway:
+services:                            # Logical group of containers that make up your application stack
+  quote-service:                     # Service name; becomes the DNS hostname on the default Compose network
     build:
-      context: .                     # Build context: repo root
-      dockerfile: gateway/Dockerfile # Dockerfile path for gateway
+      context: .                     # Build context root sent to the Docker daemon; here the repo root
+      dockerfile: quote-service/Dockerfile  # Path to Dockerfile relative to the context
+    ports:
+      - "8081:8081"                  # Host:Container port mapping; exposes service on host port 8081
+
+  order-service:                     # Second service; reachable as "order-service" by other services
+    build:
+      context: .                     # Reuse the same build context for monorepo Dockerfiles
+      dockerfile: order-service/Dockerfile  # Dockerfile dedicated to order-service
+    ports:
+      - "8082:8082"                  # Expose container port 8082 on host port 8082
+
+  gateway:                           # Edge/API gateway or reverse proxy layer
+    build:
+      context: .                     # Build using repository root as context
+      dockerfile: gateway/Dockerfile # Dockerfile dedicated to gateway image
     # No ports mapped: reachable by other services via service name "gateway"
+    # Note: Without a ports mapping, this container is not exposed to the host;
+    # it still accepts traffic internally from "quote-service" and "order-service".
+
+# Notes:
+# - Docker Compose creates a default single network for all services in this file.
+# - Each service is addressable via its service name (DNS), e.g., http://quote-service:8081.
+# - The 'ports' section publishes ports to the host for local testing; omit or change for CI.
+# - Build caching depends on the Dockerfile structure and the chosen build context.
