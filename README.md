@@ -28,7 +28,7 @@ Kubernetes (Kind) — what’s set up and why
 	•	Rolling updates are configured for a single-node cluster (no extra capacity), so we use a surge-free strategy to avoid Pending pods.
 
 	•	Typical dev flow: build image → load into Kind → rollout restart → verify health, giving you repeatable, containerized deployments that mirror production patterns
-Resilience patterns — what we added and how it behaves
+Resilience patterns — what is added and how it behaves
 
 	•	The order service calls the quote service through a small client that applies Resilience4j policies.
 
